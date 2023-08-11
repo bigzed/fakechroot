@@ -41,7 +41,10 @@ wrapper(__readlink_chk, ssize_t, (const char * path, char * buf, size_t bufsiz, 
     debug("__readlink_chk(\"%s\", &buf, %zd, %zd)", path, bufsiz, buflen);
     expand_chroot_path(path);
 
-    if ((linksize = nextcall(__readlink_chk)(path, tmp, FAKECHROOT_PATH_MAX-1, buflen)) == -1) {
+    if (buflen == -1 || bufsiz <= buflen) {
+      return -1;
+    }
+    if ((linksize = nextcall(__readlink_chk)(path, tmp, FAKECHROOT_PATH_MAX-1, FAKECHROOT_PATH_MAX-1)) == -1) {
         return -1;
     }
     tmp[linksize] = '\0';
